@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Cricket Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --danger-gradient: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+        
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .game-title {
+            text-align: center;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-custom {
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary-custom {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .btn-success-custom {
+            background: var(--success-gradient);
+            color: white;
+        }
+        
+        .btn-danger-custom {
+            background: var(--danger-gradient);
+            color: white;
+        }
+        
+        .number-btn {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .input-custom {
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-custom:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .score-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .batting {
+            background: var(--success-gradient);
+            color: white;
+        }
+        
+        .bowling {
+            background: var(--danger-gradient);
+            color: white;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 15px 0;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .match-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .player-choice {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            width: 120px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .vs-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .winner-banner {
+            background: var(--success-gradient);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            animation: slideIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-card">
+            <h1 class="game-title">🏏 Hand Cricket</h1>
+            
+            <!-- Toss Section -->
+            <div id="tossSection">
+                <h4 class="mb-3">Toss Time!</h4>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Choose Odd or Even:</label>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-custom btn-primary-custom flex-fill" onclick="selectToss('odd')">Odd</button>
+                        <button class="btn btn-custom btn-success-custom flex-fill" onclick="selectToss('even')">Even</button>
+                    </div>
+                </div>
+                <div id="tossNumberSection" class="hidden">
+                    <label class="form-label fw-bold">Enter your number (1-10):</label>
+                    <input type="number" id="tossNumber" class="form-control input-custom mb-3" min="1" max="10" placeholder="Enter 1-10">
+                    <button class="btn btn-custom btn-primary-custom w-100" onclick="playToss()">Play Toss</button>
+                </div>
+                <div id="tossResult" class="result-box hidden"></div>
+            </div>
+
+            <!-- Choice Section -->
+            <div id="choiceSection" class="hidden">
+                <h4 class="mb-3">You won the toss! Choose:</h4>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-custom btn-success-custom flex-fill" onclick="makeChoice('bat')">🏏 Bat First</button>
+                    <button class="btn btn-custom btn-danger-custom flex-fill" onclick="makeChoice('bowl')">⚾ Bowl First</button>
+                </div>
+            </div>
+
+            <!-- Game Play Section -->
+            <div id="gameSection" class="hidden">
+                <div id="statusDisplay" class="text-center mb-3"></div>
+                
+                <div class="score-display">
+                    <div class="row">
+                        <div class="col-6">
+                            <h6>Your Score</h6>
+                            <div class="score-number" id="playerScore">0</div>
+                        </div>
+                        <div class="col-6">
+                            <h6>System Score</h6>
+                            <div class="score-number" id="systemScore">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="inningInfo" class="text-center mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Choose your number (1-10):</label>
+                    <div class="text-center">
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(1)">1</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(2)">2</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(3)">3</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(4)">4</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(5)">5</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(6)">6</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(7)">7</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(8)">8</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(9)">9</button>
+                        <button class="btn btn-custom btn-primary-custom number-btn" onclick="playRound(10)">10</button>
+                    </div>
+                </div>
+
+                <div id="roundResult" class="hidden"></div>
+            </div>
+
+            <!-- Final Result Section -->
+            <div id="finalSection" class="hidden">
+                <div id="finalResult"></div>
+                <button class="btn btn-custom btn-primary-custom w-100 mt-3" onclick="restartGame()">🔄 Play Again</button>
+            </div>
+
+            <!-- Restart Button -->
+            <div id="restartBtn" class="hidden mt-3">
+                <button class="btn btn-custom btn-danger-custom w-100" onclick="restartGame()">🔄 Restart Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            tossChoice: null,
+            playerBatting: false,
+            playerScore: 0,
+            systemScore: 0,
+            inning: 1,
+            targetScore: 0,
+            gameOver: false
+        };
+
+        function selectToss(choice) {
+            gameState.tossChoice = choice;
+            document.getElementById('tossNumberSection').classList.remove('hidden');
+        }
+
+        function playToss() {
+            const playerNum = parseInt(document.getElementById('tossNumber').value);
+            if (!playerNum || playerNum < 1 || playerNum > 10) {
+                alert('Please enter a valid number between 1 and 10');
+                return;
+            }
+
+            const systemNum = Math.floor(Math.random() * 10) + 1;
+            const total = playerNum + systemNum;
+            const isOdd = total % 2 !== 0;
+            const resultType = isOdd ? 'odd' : 'even';
+            const playerWon = resultType === gameState.tossChoice;
+
+            const resultHTML = `
+                <h5>Toss Result:</h5>
+                <div class="match-display">
+                    <div class="player-choice">
+                        <div>You</div>
+                        <div class="score-number" style="font-size: 2rem;">${playerNum}</div>
+                    </div>
+                    <div class="vs-text">+</div>
+                    <div class="player-choice">
+                        <div>System</div>
+                        <div class="score-number" style="font-size: 2rem;">${systemNum}</div>
+                    </div>
+                </div>
+                <p class="mb-2"><strong>Total:</strong> ${total} (${resultType.toUpperCase()})</p>
+                <p class="mb-0"><strong>${playerWon ? '🎉 You won the toss!' : '😔 System won the toss!'}</strong></p>
+            `;
+
+            document.getElementById('tossResult').innerHTML = resultHTML;
+            document.getElementById('tossResult').classList.remove('hidden');
+            document.getElementById('tossSection').querySelector('.d-flex').classList.add('hidden');
+            document.getElementById('tossNumberSection').classList.add('hidden');
+
+            if (playerWon) {
+                setTimeout(() => {
+                    document.getElementById('choiceSection').classList.remove('hidden');
+                }, 1000);
+            } else {
+                const systemChoice = Math.random() > 0.5 ? 'bat' : 'bowl';
+                setTimeout(() => {
+                    makeChoice(systemChoice === 'bat' ? 'bowl' : 'bat', true);
+                }, 1000);
+            }
+        }
+
+        function makeChoice(choice, systemChose = false) {
+            gameState.playerBatting = choice === 'bat';
+            
+            if (systemChose) {
+                const systemAction = choice === 'bat' ? 'bowl' : 'bat';
+                alert(`System chose to ${systemAction} first. You will ${choice}!`);
+            }
+
+            document.getElementById('tossSection').classList.add('hidden');
+            document.getElementById('choiceSection').classList.add('hidden');
+            document.getElementById('gameSection').classList.remove('hidden');
+            document.getElementById('restartBtn').classList.remove('hidden');
+            updateGameStatus();
+        }
+
+        function updateGameStatus() {
+            const status = gameState.playerBatting ? 
+                '<span class="status-badge batting">You are BATTING 🏏</span>' : 
+                '<span class="status-badge bowling">You are BOWLING ⚾</span>';
+            
+            let inningText = `<strong>Inning ${gameState.inning} of 2</strong>`;
+            if (gameState.inning === 2) {
+                inningText += ` | <strong>Target: ${gameState.targetScore + 1}</strong>`;
+            }
+            
+            document.getElementById('statusDisplay').innerHTML = status;
+            document.getElementById('inningInfo').innerHTML = inningText;
+        }
+
+        function playRound(playerNum) {
+            if (gameState.gameOver) return;
+
+            const systemNum = Math.floor(Math.random() * 10) + 1;
+            const isOut = playerNum === systemNum;
+
+            const resultHTML = `
+                <div class="result-box">
+                    <div class="match-display">
+                        <div class="player-choice">
+                            <div>You</div>
+                            <div class="score-number" style="font-size: 2rem;">${playerNum}</div>
+                        </div>
+                        <div class="vs-text">VS</div>
+                        <div class="player-choice">
+                            <div>System</div>
+                            <div class="score-number" style="font-size: 2rem;">${systemNum}</div>
+                        </div>
+                    </div>
+                    ${isOut ? '<h4 class="text-danger mt-3 mb-0">🚫 OUT!</h4>' : 
+                              `<h5 class="text-success mt-3 mb-0">✓ ${gameState.playerBatting ? 'Runs scored' : 'Run prevented'}: ${playerNum}</h5>`}
+                </div>
+            `;
+
+            document.getElementById('roundResult').innerHTML = resultHTML;
+            document.getElementById('roundResult').classList.remove('hidden');
+
+            if (isOut) {
+                handleOut();
+            } else {
+                if (gameState.playerBatting) {
+                    gameState.playerScore += playerNum;
+                } else {
+                    gameState.systemScore += playerNum;
+                }
+                updateScores();
+                
+                if (gameState.inning === 2) {
+                    checkSecondInningWin();
+                }
+            }
+        }
+
+        function handleOut() {
+            setTimeout(() => {
+                if (gameState.inning === 1) {
+                    gameState.targetScore = gameState.playerBatting ? gameState.playerScore : gameState.systemScore;
+                    gameState.inning = 2;
+                    gameState.playerBatting = !gameState.playerBatting;
+                    document.getElementById('roundResult').classList.add('hidden');
+                    updateGameStatus();
+                    updateScores();
+                } else {
+                    endGame();
+                }
+            }, 2000);
+        }
+
+        function checkSecondInningWin() {
+            const chasingScore = gameState.playerBatting ? gameState.playerScore : gameState.systemScore;
+            if (chasingScore > gameState.targetScore) {
+                setTimeout(() => {
+                    endGame();
+                }, 1500);
+            }
+        }
+
+        function updateScores() {
+            document.getElementById('playerScore').textContent = gameState.playerScore;
+            document.getElementById('systemScore').textContent = gameState.systemScore;
+        }
+
+        function endGame() {
+            gameState.gameOver = true;
+            document.getElementById('gameSection').classList.add('hidden');
+            document.getElementById('finalSection').classList.remove('hidden');
+
+            let winner, winnerText;
+            if (gameState.playerScore > gameState.systemScore) {
+                winner = 'You';
+                winnerText = '🎉 Congratulations! You Won! 🎉';
+            } else if (gameState.systemScore > gameState.playerScore) {
+                winner = 'System';
+                winnerText = '😔 System Won! Better luck next time!';
+            } else {
+                winner = 'Tie';
+                winnerText = '🤝 It\'s a Tie!';
+            }
+
+            const finalHTML = `
+                <div class="winner-banner">${winnerText}</div>
+                <div class="score-display mt-3">
+                    <h5>Final Scores</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <h6>Your Score</h6>
+                            <div class="score-number">${gameState.playerScore}</div>
+                        </div>
+                        <div class="col-6">
+                            <h6>System Score</h6>
+                            <div class="score-number">${gameState.systemScore}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('finalResult').innerHTML = finalHTML;
+        }
+
+        function restartGame() {
+            gameState = {
+                tossChoice: null,
+                playerBatting: false,
+                playerScore: 0,
+                systemScore: 0,
+                inning: 1,
+                targetScore: 0,
+                gameOver: false
+            };
+
+            document.getElementById('tossSection').classList.remove('hidden');
+            document.getElementById('tossSection').querySelector('.d-flex').classList.remove('hidden');
+            document.getElementById('tossNumberSection').classList.add('hidden');
+            document.getElementById('tossResult').classList.add('hidden');
+            document.getElementById('choiceSection').classList.add('hidden');
+            document.getElementById('gameSection').classList.add('hidden');
+            document.getElementById('finalSection').classList.add('hidden');
+            document.getElementById('restartBtn').classList.add('hidden');
+            document.getElementById('roundResult').classList.add('hidden');
+            document.getElementById('tossNumber').value = '';
+            
+            updateScores();
+        }
+    </script>
+</body>
+</html>
